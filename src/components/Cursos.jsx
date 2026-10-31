@@ -214,7 +214,7 @@ export function Cursos({ user }) {
             >
               <div>
                 <div className="flex justify-between items-start mb-4">
-                  <div className="w-14 h-14 bg-[#13203c]/50 border border-[#223966] rounded-xl overflow-hidden p-1.5 flex items-center justify-center shadow-inner">
+                  <div className="w-30 h-30 bg-[#13203c]/50 border border-[#223966] rounded-xl overflow-hidden p-1.5 flex items-center justify-center shadow-inner">
                     <img 
                       src={curso.imagen || '/logo.jpg'} 
                       alt={curso.nombre} 

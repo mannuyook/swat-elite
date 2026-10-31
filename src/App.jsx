@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from './services/authService';
+import { supabase } from './supabaseClient';
 import { Cursos } from './components/Cursos';
 import { Medallas } from './components/Medallas';
 import { Movimientos } from './components/Movimientos';
 import { Roster } from './components/Roster';
 import { Macros } from './components/Macros';
-import { Bell, LogOut, ShieldCheck, User as UserIcon, Key, UserPlus, Hash, Shield } from 'lucide-react';
+import { LogOut, User as UserIcon, Key, UserPlus, Camera, X, CheckCircle2 } from 'lucide-react';
 
 export function App() {
   const [user, setUser] = useState(null);
@@ -27,6 +28,13 @@ export function App() {
   const [regSuccess, setRegSuccess] = useState('');
   const [loadingReg, setLoadingReg] = useState(false);
 
+  // Estados para el Modal de Perfil y Cambio de Avatar
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [avatarBase64, setAvatarBase64] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileToast, setProfileToast] = useState(null);
+
   // Al cargar la app, verificar si ya hay una sesión guardada en localStorage
   useEffect(() => {
     const savedUser = authService.getCurrentUser();
@@ -38,6 +46,11 @@ export function App() {
       }
     }
   }, []);
+
+  const showToastMsg = (msg) => {
+    setProfileToast(msg);
+    setTimeout(() => setProfileToast(null), 3500);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -104,7 +117,48 @@ export function App() {
     setPasswordInput('');
   };
 
-  // Validar si el usuario actual tiene permisos para ver movimientos (Auxiliar, Admin, Developer)
+  // Convertir imagen seleccionada a Base64 para el perfil
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarBase64(reader.result);
+      setAvatarPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Guardar la foto en Base64 en la tabla 'usuarios' y actualizar sesión
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    if (!avatarBase64) return;
+    setSavingProfile(true);
+
+    try {
+      const { error } = await supabase
+        .from('usuarios')
+        .update({ avatar_base64: avatarBase64 })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      const updatedUser = { ...user, avatar_base64: avatarBase64 };
+      setUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+      showToastMsg('¡Foto de perfil actualizada con éxito!');
+      setShowProfileModal(false);
+    } catch (err) {
+      console.error('Error al actualizar avatar:', err);
+      showToastMsg('Error al actualizar la foto de perfil.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  // Validar si el usuario actual tiene permisos para ver movimientos
   const rolUser = user?.rol ? user.rol.toLowerCase() : '';
   const puedeVerMovimientos = rolUser === 'developer' || rolUser === 'administrador' || rolUser === 'auxiliar';
 
@@ -113,23 +167,16 @@ export function App() {
   // ==========================================
   if (!user) {
     return (
-      /* 
-        =======================================================================
-        CONTENEDOR DE ACCESO CON IMAGEN DE FONDO Y CAPA OSCURA
-        =======================================================================
-      */
       <div 
         className="flex h-screen w-screen items-center justify-center bg-cover bg-center text-white font-sans p-4 overflow-y-auto relative"
         style={{ backgroundImage: "url('/fondo-login.png')" }}
       >
-        {/* CAPA OSCURA / SOMBRA (OVERLAY) */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] pointer-events-none"></div>
 
-        {/* TARJETA DE ACCESO CENTRADA */}
         <div className="w-full max-w-md bg-[#0d172e]/95 border border-[#1b315e] rounded-2xl p-8 shadow-2xl space-y-6 my-auto relative z-10">
           
           <div className="flex flex-col items-center text-center space-y-3">
-            <div className="w-50 h-50 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+            <div className="w-20 h-20 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
               <img 
                 src="/logo.jpg" 
                 alt="SWAT Elite Logo" 
@@ -143,7 +190,6 @@ export function App() {
             </div>
           </div>
 
-          {/* PESTAÑAS DE NAVEGACIÓN LOGIN / REGISTRO */}
           <div className="grid grid-cols-2 gap-2 bg-[#13203c] p-1 rounded-xl border border-[#223966]">
             <button
               onClick={() => { setAuthView('login'); setLoginError(''); }}
@@ -159,7 +205,6 @@ export function App() {
             </button>
           </div>
 
-          {/* VISTA DE INICIO DE SESIÓN */}
           {authView === 'login' ? (
             <div className="space-y-4">
               {loginError && (
@@ -209,7 +254,6 @@ export function App() {
               </form>
             </div>
           ) : (
-            /* VISTA DE REGISTRO DE NUEVO AGENTE */
             <div className="space-y-4">
               {regError && (
                 <div className="p-3 bg-red-950/80 border border-red-500/60 rounded-xl text-red-300 text-xs text-center font-bold">
@@ -303,17 +347,24 @@ export function App() {
   // SI HAY SESIÓN ACTIVA, MOSTRAR PANEL TÁCTICO
   // ==========================================
   return (
-    <div className="flex h-screen bg-[#070e1b] text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#070e1b] text-white font-sans overflow-hidden relative">
       
+      {/* TOAST FLOTANTE */}
+      {profileToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0d172e] border border-emerald-500/50 text-emerald-400 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 backdrop-blur-md">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 animate-bounce" />
+          <span className="text-xs font-black uppercase tracking-wider text-slate-100">{profileToast}</span>
+        </div>
+      )}
+
       {/* MENÚ LATERAL DE NAVEGACIÓN TÁCTICA */}
       <aside className="w-64 bg-[#0d172e] border-r border-[#1b315e] p-5 flex flex-col justify-between shadow-2xl flex-shrink-0">
         <div className="space-y-6">
           
-          {/* LOGOTIPO / CABECERA CENTRADA */}
           <div className="flex flex-col items-center text-center p-2 space-y-3 border-b border-[#1b315e] pb-6">
-            <div className="w-50 h-50 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+            <div className="w-20 h-20 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
               <img 
-                src="/logo.jpg" 
+                src={user.avatar_base64 || "/logo.jpg"} 
                 alt="SWAT Elite Logo" 
                 className="w-full h-full object-cover rounded-full filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
                 onError={(e) => { e.target.src = '/logo.jpg'; }}
@@ -325,12 +376,9 @@ export function App() {
             </div>
           </div>
 
-          {/* NAVEGACIÓN */}
           <div className="space-y-2">
             <p className="px-2 text-[10px] font-black uppercase text-slate-500 tracking-wider">Navegación</p>
             <nav className="space-y-1">
-              
-              {/* Botón Movimientos (Solo visible para Auxiliar, Admin y Developer) */}
               {puedeVerMovimientos && (
                 <button 
                   onClick={() => setActiveTab('movimientos')}
@@ -372,11 +420,14 @@ export function App() {
 
         </div>
 
-        {/* PIE DE BARRA LATERAL (PERFIL DE USUARIO LOGUEADO) */}
         <div className="pt-4 border-t border-[#1b315e] px-2 flex items-center justify-between">
           <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-[#1e293b] border border-[#334155] flex items-center justify-center text-xs font-black text-slate-200 shadow-inner flex-shrink-0">
-              {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+            <div className="w-8 h-8 rounded-xl bg-[#1e293b] border border-[#334155] overflow-hidden flex items-center justify-center text-xs font-black text-slate-200 shadow-inner flex-shrink-0">
+              {user.avatar_base64 ? (
+                <img src={user.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                user.username ? user.username.charAt(0).toUpperCase() : 'U'
+              )}
             </div>
             <div className="overflow-hidden">
               <p className="text-xs font-black text-white truncate">{user.username}</p>
@@ -392,14 +443,21 @@ export function App() {
         {/* BARRA SUPERIOR */}
         <header className="h-20 bg-[#1e293b]/90 backdrop-blur-md border-b border-[#334155] px-8 flex justify-between items-center shadow-md flex-shrink-0">
           <div className="text-xs font-black uppercase tracking-wider text-slate-200">
-            Panel de Control Táctico — Conectado como: <span className="text-amber-400">{user.username} ({user.rol})</span>
+            Bienvenido, <span className="text-amber-400">{user.username} ({user.rol})</span>
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Botón de Notificaciones */}
-            <button className="flex items-center space-x-2 px-4 py-2.5 bg-[#334155] hover:bg-[#475569] border border-amber-500/50 rounded-xl text-xs font-black uppercase text-amber-400 shadow-lg transition-all cursor-pointer">
-              <Bell className="w-4 h-4 text-amber-400" />
-              <span>Notificaciones</span>
+            {/* Botón de Perfil (Sustituye a Notificaciones) */}
+            <button 
+              onClick={() => {
+                setAvatarPreview(user.avatar_base64 || '');
+                setAvatarBase64(user.avatar_base64 || '');
+                setShowProfileModal(true);
+              }}
+              className="flex items-center space-x-2 px-4 py-2.5 bg-[#334155] hover:bg-[#475569] border border-amber-500/50 rounded-xl text-xs font-black uppercase text-amber-400 shadow-lg transition-all cursor-pointer"
+            >
+              <UserIcon className="w-4 h-4 text-amber-400" />
+              <span>Perfil</span>
             </button>
 
             {/* Botón Cerrar Sesión Real */}
@@ -426,6 +484,72 @@ export function App() {
         </main>
 
       </div>
+
+      {/* MODAL DE PERFIL Y SUBIDA DE FOTO EN BASE64 */}
+      {showProfileModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0d172e] border border-[#223d73] w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-5 animate-fade-in">
+            
+            <div className="flex justify-between items-center border-b border-[#1b315e] pb-3">
+              <h3 className="text-sm font-black uppercase tracking-wider text-white flex items-center space-x-2">
+                <UserIcon className="w-4 h-4 text-amber-400" />
+                <span>Configuración de Perfil</span>
+              </h3>
+              <button 
+                onClick={() => setShowProfileModal(false)}
+                className="text-slate-400 hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div className="flex flex-col items-center space-y-3">
+                <div className="w-24 h-24 rounded-full bg-[#13203c] border-2 border-amber-500/60 overflow-hidden flex items-center justify-center shadow-xl">
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Avatar Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl font-black text-amber-400">{user.username ? user.username.charAt(0).toUpperCase() : 'U'}</span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-400 font-semibold">Agente: <span className="text-white font-bold">{user.username}</span></p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-slate-400">Subir Nueva Foto de Perfil</label>
+                <label className="flex cursor-pointer bg-[#13203c] hover:bg-[#18284b] border border-[#223966] rounded-xl px-4 py-3 items-center justify-center space-x-2 text-xs font-bold text-slate-300 transition-all shadow-inner">
+                  <Camera className="w-4 h-4 text-amber-400" />
+                  <span>Seleccionar Imagen...</span>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleAvatarChange}
+                    className="hidden" 
+                  />
+                </label>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowProfileModal(false)}
+                  className="px-4 py-2.5 bg-[#13203c] hover:bg-[#18284b] border border-[#223966] rounded-xl text-xs font-bold text-slate-400 uppercase transition-all cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="px-5 py-2.5 bg-[#334155] hover:bg-[#475569] border border-amber-500/60 text-amber-400 rounded-xl text-xs font-black uppercase shadow-lg transition-all cursor-pointer"
+                >
+                  {savingProfile ? 'Guardando...' : 'Guardar Cambios'}
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

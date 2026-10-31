@@ -34,6 +34,7 @@ export function Roster({ user }) {
   const [medallasAgente, setMedallasAgente] = useState([]);
 
   const currentUserRol = (user?.rol || 'miembro').toLowerCase();
+  const isAdminOrDev = currentUserRol === 'developer' || currentUserRol === 'administrador';
 
   const cargarAgentes = async () => {
     setLoading(true);
@@ -227,6 +228,35 @@ export function Roster({ user }) {
     }
   };
 
+  const handleRemoverCurso = async (cursoId, cursoNombre) => {
+    if (!isAdminOrDev) {
+      setActionMsg({ type: 'error', text: 'No tienes permisos para retirar cursos.' });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('cursos_asignados')
+        .delete()
+        .eq('usuario_id', String(selectedAgent.id))
+        .eq('curso_id', String(cursoId));
+
+      if (error) throw error;
+
+      await supabase.from('movimientos').insert([{
+        usuario_responsable_id: user?.username || 'Sistema',
+        accion: `${user?.username || 'Admin'} retiró el curso "${cursoNombre}" al agente ${selectedAgent.username}`,
+        tipo: 'CURSO'
+      }]);
+
+      await cargarCatalogosYAsignaciones(selectedAgent.id);
+      setActionMsg({ type: 'success', text: `¡Curso "${cursoNombre}" retirado con éxito!` });
+    } catch (err) {
+      console.error('Excepción al remover curso:', err);
+      setActionMsg({ type: 'error', text: 'Error al retirar el curso.' });
+    }
+  };
+
   const handleAsignarMedalla = async (medallaId, medallaNombre) => {
     try {
       const yaLaTiene = medallasAgente.some(m => String(m.medalla_id) === String(medallaId));
@@ -252,6 +282,35 @@ export function Roster({ user }) {
     } catch (err) {
       console.error('Excepción al otorgar medalla:', err);
       setActionMsg({ type: 'error', text: 'Error al otorgar la medalla.' });
+    }
+  };
+
+  const handleRemoverMedalla = async (medallaId, medallaNombre) => {
+    if (!isAdminOrDev) {
+      setActionMsg({ type: 'error', text: 'No tienes permisos para retirar medallas.' });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('medallas_otorgadas')
+        .delete()
+        .eq('usuario_id', String(selectedAgent.id))
+        .eq('medalla_id', String(medallaId));
+
+      if (error) throw error;
+
+      await supabase.from('movimientos').insert([{
+        usuario_responsable_id: user?.username || 'Sistema',
+        accion: `${user?.username || 'Admin'} retiró la medalla "${medallaNombre}" al agente ${selectedAgent.username}`,
+        tipo: 'MEDALLA'
+      }]);
+
+      await cargarCatalogosYAsignaciones(selectedAgent.id);
+      setActionMsg({ type: 'success', text: `¡Medalla "${medallaNombre}" retirada con éxito!` });
+    } catch (err) {
+      console.error('Excepción al remover medalla:', err);
+      setActionMsg({ type: 'error', text: 'Error al retirar la medalla.' });
     }
   };
 
@@ -375,10 +434,10 @@ export function Roster({ user }) {
                 key={agente.id}
                 className="grid grid-cols-12 gap-3 p-3 bg-[#0a1324] border border-[#1b315e] hover:border-slate-500 rounded-xl shadow-lg items-center transition-all group"
               >
-                {/* AVATAR */}
+                {/* AVATAR CUADRADO */}
                 <div 
                   onClick={() => abrirPerfilPublico(agente)}
-                  className="col-span-3 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl h-16 flex items-center justify-center overflow-hidden p-1.5 relative shadow-inner cursor-pointer hover:border-amber-400 transition-colors"
+                  className="col-span-3 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl w-16 h-16 flex items-center justify-center overflow-hidden p-1.5 relative shadow-inner cursor-pointer hover:border-amber-400 transition-colors mx-auto"
                   title="Ver Hoja de Servicios"
                 >
                   {agente.avatar_base64 ? (
@@ -386,7 +445,7 @@ export function Roster({ user }) {
                   ) : (
                     <User className="w-7 h-7 text-slate-400" />
                   )}
-                  <span className="absolute bottom-1.5 right-1.5 w-3 h-3 bg-emerald-500 border-2 border-[#0a1324] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                  <span className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0a1324] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                 </div>
 
                 {/* NOMBRE */}
@@ -426,7 +485,7 @@ export function Roster({ user }) {
                   </span>
                 </div>
 
-                {/* BOTÓN DE GESTIÓN / EDITAR */}
+                {/* ACCIÓN */}
                 <div className="col-span-12 sm:col-span-1 flex justify-center items-center h-16 space-x-1">
                   <button
                     onClick={() => abrirPerfilPublico(agente)}
@@ -454,10 +513,10 @@ export function Roster({ user }) {
         </div>
       )}
 
-      {/* MODAL 1: HOJA DE SERVICIOS / PERFIL PÚBLICO AMPLIADO CON DISEÑO SIMÉTRICO IDÉNTICO */}
+      {/* MODAL 1: HOJA DE SERVICIOS / PERFIL PÚBLICO AMPLIADO */}
       {viewProfileAgent && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#0d172e] border border-[#1b315e] rounded-2xl max-w-8xl w-full p-10 shadow-2xl space-y-6 relative my-auto animate-scale-in">
+          <div className="bg-[#0d172e] border border-[#1b315e] rounded-2xl max-w-5xl w-full p-10 shadow-2xl space-y-6 relative my-auto animate-scale-in">
             
             <button 
               onClick={() => setViewProfileAgent(null)}
@@ -466,7 +525,6 @@ export function Roster({ user }) {
               <X className="w-5 h-5" />
             </button>
 
-            {/* ENCABEZADO DEL PERFIL */}
             <div className="flex items-center space-x-5 border-b border-[#1b315e] pb-6">
               <div className="w-20 h-20 bg-[#13203c] border border-[#223966] rounded-2xl overflow-hidden flex items-center justify-center shadow-inner flex-shrink-0">
                 {viewProfileAgent.avatar_base64 ? (
@@ -480,14 +538,13 @@ export function Roster({ user }) {
                   Placa #{viewProfileAgent.placa ? String(viewProfileAgent.placa).padStart(2, '0') : '00'}
                 </span>
                 <h3 className="text-xl font-black uppercase text-white tracking-wide pt-1">{viewProfileAgent.username}</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase">Rango: <span className="text-slate-200">{viewProfileAgent.rango || 'Recluta'}</span> • Rol: <span className="text-amber-400">{viewProfileAgent.rol || 'miembro'}</span></p>
+                <p className="text-xs text-slate-400 font-bold uppercase">Rango: <span className="text-slate-200">{viewProfileAgent.rango || 'Recluta'}</span> | Rol: <span className="text-amber-400">{viewProfileAgent.rol || 'miembro'}</span></p>
               </div>
             </div>
 
-            {/* DISEÑO EN DOS COLUMNAS AMPLIAS CON FORMATO UNIFICADO */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              {/* COLUMNA IZQUIERDA: CURSOS (ESTILO TARJETA GRANDE IDÉNTICO A MEDALLAS) */}
+              {/* CURSOS */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-black uppercase text-slate-200 flex items-center space-x-2">
@@ -510,9 +567,9 @@ export function Roster({ user }) {
                       <div key={c.id} className="flex items-center justify-between p-4 bg-[#0d172e] border border-[#1b315e] rounded-2xl shadow-md hover:border-slate-500 transition-all">
                         <div className="flex items-center space-x-4 overflow-hidden">
                           {c.imagen ? (
-                            <img src={c.imagen} alt="" className="w-12 h-12 object-cover rounded-xl flex-shrink-0 border border-[#223966]" />
+                            <img src={c.imagen} alt="" className="w-16 h-16 object-cover rounded-xl flex-shrink-0 border border-[#223966]" />
                           ) : (
-                            <div className="w-12 h-12 rounded-xl bg-[#13203c] border border-[#223966] flex items-center justify-center flex-shrink-0 text-amber-400 font-black text-sm">C</div>
+                            <div className="w-16 h-16 rounded-xl bg-[#13203c] border border-[#223966] flex items-center justify-center flex-shrink-0 text-amber-400 font-black text-sm">C</div>
                           )}
                           <div className="overflow-hidden">
                             <span className="text-xs font-black text-white uppercase tracking-wide block truncate">{c.nombre}</span>
@@ -528,7 +585,7 @@ export function Roster({ user }) {
                 </div>
               </div>
 
-              {/* COLUMNA DERECHA: MEDALLAS Y CONDECORACIONES */}
+              {/* MEDALLAS */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-black uppercase text-slate-200 flex items-center space-x-2">
@@ -543,7 +600,7 @@ export function Roster({ user }) {
                 <div className="bg-[#070e1b] border border-[#1b315e] rounded-2xl p-4 h-96 overflow-y-auto space-y-3 shadow-inner">
                   {profileMedallas.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2">
-                      <Award className="w-8 h-8 text-slate-600" />
+                      <Award className="w-12 h-12 text-slate-600" />
                       <p className="text-xs text-slate-500 italic">Este agente aún no ha recibido condecoraciones oficiales.</p>
                     </div>
                   ) : (
@@ -551,7 +608,7 @@ export function Roster({ user }) {
                       <div key={m.id} className="flex items-center justify-between p-4 bg-[#0d172e] border border-[#1b315e] rounded-2xl shadow-md hover:border-slate-500 transition-all">
                         <div className="flex items-center space-x-4 overflow-hidden">
                           {m.imagen ? (
-                            <img src={m.imagen} alt="" className="w-12 h-12 object-cover rounded-xl flex-shrink-0 border border-[#223966]" />
+                            <img src={m.imagen} alt="" className="w-16 h-16 object-cover rounded-xl flex-shrink-0 border border-[#223966]" />
                           ) : (
                             <div className="w-12 h-12 rounded-xl bg-[#13203c] border border-[#223966] flex items-center justify-center flex-shrink-0 text-amber-400 font-black text-sm">M</div>
                           )}
@@ -571,7 +628,6 @@ export function Roster({ user }) {
 
             </div>
 
-            {/* BOTÓN CERRAR */}
             <div className="pt-3">
               <button
                 onClick={() => setViewProfileAgent(null)}
@@ -621,7 +677,6 @@ export function Roster({ user }) {
                 </div>
               )}
 
-              {/* MODIFICAR ROL Y RANGO */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] font-black uppercase text-slate-400">Rol del Sistema</label>
@@ -657,7 +712,6 @@ export function Roster({ user }) {
                 </div>
               </div>
 
-              {/* MODIFICAR PLACA */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400">Número de Placa (1-999)</label>
                 <input
@@ -670,7 +724,6 @@ export function Roster({ user }) {
                 />
               </div>
 
-              {/* CAMBIAR CONTRASEÑA */}
               <div className="space-y-1 pt-2 border-t border-[#1b315e]">
                 <label className="text-[10px] font-black uppercase text-amber-400 flex items-center space-x-1">
                   <Key className="w-3 h-3" />
@@ -686,33 +739,48 @@ export function Roster({ user }) {
                 />
               </div>
 
-              {/* SECCIÓN DE ASIGNACIÓN DE CURSOS Y MEDALLAS */}
+              {/* SECCIÓN DE ASIGNACIÓN Y RETIRO DE CURSOS Y MEDALLAS */}
               <div className="space-y-4 pt-3 border-t border-[#1b315e]">
                 
                 {/* CURSOS */}
                 <div>
                   <label className="text-[10px] font-black uppercase text-slate-300 flex items-center space-x-1 mb-2">
                     <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Asignación de Cursos Tácticos</span>
+                    <span>Gestión de Cursos Tácticos</span>
                   </label>
                   <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-2.5 bg-[#070e1b] rounded-xl border border-[#1b315e]">
                     {cursosDisponibles.map((curso) => {
                       const yaLoTiene = cursosAgente.some(c => String(c.curso_id) === String(curso.id));
                       return (
-                        <button
-                          key={curso.id}
-                          type="button"
-                          onClick={() => handleAsignarCurso(curso.id, curso.nombre)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 transition-all cursor-pointer ${
-                            yaLoTiene 
-                              ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-600/50 shadow-sm' 
-                              : 'bg-[#13203c] hover:bg-[#1b315e] text-slate-300 border border-[#223966]'
-                          }`}
-                        >
-                          <span className={`w-2 h-2 rounded-full ${yaLoTiene ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : 'bg-slate-500'}`}></span>
-                          <span>{curso.nombre}</span>
-                          {yaLoTiene && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 ml-1" />}
-                        </button>
+                        <div key={curso.id} className="flex items-center space-x-1">
+                          {yaLoTiene ? (
+                            isAdminOrDev ? (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoverCurso(curso.id, curso.nombre)}
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 bg-red-950/60 text-red-300 border border-red-600/50 hover:bg-red-900/80 transition-all cursor-pointer shadow-sm"
+                                title="Clic para retirar este curso"
+                              >
+                                <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                                <span>{curso.nombre} (Quitar)</span>
+                              </button>
+                            ) : (
+                              <div className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 bg-emerald-950/60 text-emerald-300 border border-emerald-600/50">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                <span>{curso.nombre} (Asignado)</span>
+                              </div>
+                            )
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleAsignarCurso(curso.id, curso.nombre)}
+                              className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 bg-[#13203c] hover:bg-[#1b315e] text-slate-300 border border-[#223966] transition-all cursor-pointer"
+                            >
+                              <span className="w-2 h-2 rounded-full bg-slate-500"></span>
+                              <span>{curso.nombre} (Asignar)</span>
+                            </button>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
@@ -722,26 +790,41 @@ export function Roster({ user }) {
                 <div>
                   <label className="text-[10px] font-black uppercase text-slate-300 flex items-center space-x-1 mb-2">
                     <Award className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Otorgar Medallas y Condecoraciones</span>
+                    <span>Gestión de Medallas y Condecoraciones</span>
                   </label>
                   <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-2.5 bg-[#070e1b] rounded-xl border border-[#1b315e]">
                     {medallasDisponibles.map((medalla) => {
                       const yaLaTiene = medallasAgente.some(m => String(m.medalla_id) === String(medalla.id));
                       return (
-                        <button
-                          key={medalla.id}
-                          type="button"
-                          onClick={() => handleAsignarMedalla(medalla.id, medalla.nombre)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 transition-all cursor-pointer ${
-                            yaLaTiene 
-                              ? 'bg-amber-950/60 text-amber-300 border border-amber-600/50 shadow-sm' 
-                              : 'bg-[#13203c] hover:bg-[#1b315e] text-slate-300 border border-[#223966]'
-                          }`}
-                        >
-                          <span className={`w-2 h-2 rounded-full ${yaLaTiene ? 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]' : 'bg-slate-500'}`}></span>
-                          <span>{medalla.nombre}</span>
-                          {yaLaTiene && <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 ml-1" />}
-                        </button>
+                        <div key={medalla.id} className="flex items-center space-x-1">
+                          {yaLaTiene ? (
+                            isAdminOrDev ? (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoverMedalla(medalla.id, medalla.nombre)}
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 bg-red-950/60 text-red-300 border border-red-600/50 hover:bg-red-900/80 transition-all cursor-pointer shadow-sm"
+                                title="Clic para retirar esta medalla"
+                              >
+                                <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                                <span>{medalla.nombre} (Quitar)</span>
+                              </button>
+                            ) : (
+                              <div className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 bg-amber-950/60 text-amber-300 border border-amber-600/50">
+                                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                                <span>{medalla.nombre} (Otorgada)</span>
+                              </div>
+                            )
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleAsignarMedalla(medalla.id, medalla.nombre)}
+                              className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-2 bg-[#13203c] hover:bg-[#1b315e] text-slate-300 border border-[#223966] transition-all cursor-pointer"
+                            >
+                              <span className="w-2 h-2 rounded-full bg-slate-500"></span>
+                              <span>{medalla.nombre} (Otorgar)</span>
+                            </button>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
@@ -749,7 +832,6 @@ export function Roster({ user }) {
 
               </div>
 
-              {/* BOTONES DE ACCIÓN (DAR DE BAJA / GUARDAR) */}
               <div className="flex items-center justify-between pt-4 border-t border-[#1b315e]">
                 {canDeleteUser ? (
                   <button
