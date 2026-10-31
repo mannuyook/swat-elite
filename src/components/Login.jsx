@@ -42,7 +42,7 @@ export function Login({ onLoginSuccess }) {
 
     try {
       if (isRegistering) {
-        // 1. Registrar el usuario enviando los campos requeridos por la tabla 'usuarios'
+        // Registrar el usuario enviando los campos requeridos por la tabla 'usuarios'
         const regResult = await authService.register({
           username,
           password,
@@ -79,39 +79,50 @@ export function Login({ onLoginSuccess }) {
   };
 
   return (
-    /* CONTENEDOR PRINCIPAL: Estructura vertical para empujar el footer al fondo */
-    <div className="min-h-screen flex flex-col justify-between bg-[#0a152d] px-4 py-6 font-sans">
+    /* 
+      =========================================================================
+      CONTENEDOR PRINCIPAL CON LA IMAGEN DE FONDO Y CAPA OSCURA
+      =========================================================================
+      * AQUÍ ESTÁ EL CAMBIO DEL FONDO:
+      - bg-cover bg-center: Ajusta la imagen para que cubra toda la pantalla de forma perfecta.
+      - backgroundImage: Aquí es donde apunta a tu imagen dentro de la carpeta public.
+    */
+    <div 
+      className="min-h-screen flex flex-col justify-between bg-cover bg-center px-4 py-6 font-sans relative"
+      style={{ backgroundImage: "url('/fondo-login.png')" }}
+    >
       
+      {/* CAPA OSCURA / SOMBRA (OVERLAY): Oscurece la imagen de fondo para que la tarjeta resalte y sea legible */}
+      <div className="absolute inset-0 bg-[#0a152d]/75 backdrop-blur-[2px] pointer-events-none"></div>
+
       {/* ESPACIADOR SUPERIOR VACÍO PARA EQUILIBRAR */}
-      <div className="hidden sm:block"></div>
+      <div className="hidden sm:block relative z-10"></div>
 
       {/* TARJETA DEL PORTAL (CENTRADA) */}
-      <div className="w-full max-w-lg mx-auto bg-[#112347] border border-[#1e3a70] rounded-xl shadow-2xl p-6 sm:p-8 relative overflow-hidden">
+      <div className="w-full max-w-lg mx-auto bg-[#112347]/95 border border-[#1e3a70] rounded-xl shadow-2xl p-6 sm:p-8 relative z-10 overflow-hidden">
         
         {/* LÍNEA DECORATIVA SUPERIOR */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#112347] via-[#2a4d8c] to-[#112347]"></div>
 
         {/* ZONA DEL LOGO Y TÍTULOS */}
         <div className="flex flex-col items-center text-center p-2 space-y-3 border-b border-[#1b315e] pb-6">
-  <div className="w-20 h-20 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
-    <img 
-      src="/logo.jpg" 
-      alt="SWAT Elite Logo" 
-      className="w-full h-full object-cover rounded-full filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
-      onError={(e) => { e.target.src = '/logo.jpg'; }}
-    />
-  </div>
-  <div>
-    <h1 className="text-sm font-black uppercase tracking-wider text-white">SWAT ELITE</h1>
-    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Lincoln</p>
-  </div>
+          <div className="w-60 h-60 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+            <img 
+              src="/logo.jpg" 
+              alt="SWAT Elite Logo" 
+              className="w-full h-full object-cover rounded-full filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
+              onError={(e) => { e.target.src = '/logo.jpg'; }}
+            />
+          </div>
 
-          <h1 className="text-2xl font-black tracking-wider text-slate-100 uppercase">
-            SWAT ELITE
-          </h1>
-          <p className="text-xs font-semibold tracking-widest text-[#94a3b8] uppercase mt-1">
-            Sistema Central de Operaciones
-          </p>
+          <div>
+            <h1 className="text-2xl font-black tracking-wider text-slate-100 uppercase">
+              SWAT ELITE
+            </h1>
+            <p className="text-xs font-semibold tracking-widest text-[#94a3b8] uppercase mt-1">
+              Sistema Central de Operaciones
+            </p>
+          </div>
         </div>
 
         {/* MENSAJE DE ERROR */}
@@ -252,7 +263,7 @@ export function Login({ onLoginSuccess }) {
       </div>
 
       {/* LÍNEA DE DERECHOS RESERVADOS (ABAJO DE TODO EN LA PÁGINA) */}
-      <footer className="mt-8 text-center">
+      <footer className="mt-8 text-center relative z-10">
         <p className="text-[11px] text-[#94a3b8] tracking-wide">
           {'©'} {new Date().getFullYear()} SWAT ELITE LINCOLN. Todos los derechos reservados.
         </p>

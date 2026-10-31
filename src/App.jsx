@@ -113,11 +113,23 @@ export function App() {
   // ==========================================
   if (!user) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-[#070e1b] text-white font-sans p-4 overflow-y-auto">
-        <div className="w-full max-w-md bg-[#0d172e] border border-[#1b315e] rounded-2xl p-8 shadow-2xl space-y-6 my-auto">
+      /* 
+        =======================================================================
+        CONTENEDOR DE ACCESO CON IMAGEN DE FONDO Y CAPA OSCURA
+        =======================================================================
+      */
+      <div 
+        className="flex h-screen w-screen items-center justify-center bg-cover bg-center text-white font-sans p-4 overflow-y-auto relative"
+        style={{ backgroundImage: "url('/fondo-login.png')" }}
+      >
+        {/* CAPA OSCURA / SOMBRA (OVERLAY) */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] pointer-events-none"></div>
+
+        {/* TARJETA DE ACCESO CENTRADA */}
+        <div className="w-full max-w-md bg-[#0d172e]/95 border border-[#1b315e] rounded-2xl p-8 shadow-2xl space-y-6 my-auto relative z-10">
           
           <div className="flex flex-col items-center text-center space-y-3">
-            <div className="w-20 h-20 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+            <div className="w-50 h-50 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
               <img 
                 src="/logo.jpg" 
                 alt="SWAT Elite Logo" 
@@ -299,7 +311,7 @@ export function App() {
           
           {/* LOGOTIPO / CABECERA CENTRADA */}
           <div className="flex flex-col items-center text-center p-2 space-y-3 border-b border-[#1b315e] pb-6">
-            <div className="w-20 h-20 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+            <div className="w-50 h-50 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
               <img 
                 src="/logo.jpg" 
                 alt="SWAT Elite Logo" 
