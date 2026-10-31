@@ -437,7 +437,7 @@ export function Roster({ user }) {
                 {/* AVATAR CUADRADO */}
                 <div 
                   onClick={() => abrirPerfilPublico(agente)}
-                  className="col-span-3 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl w-16 h-16 flex items-center justify-center overflow-hidden p-1.5 relative shadow-inner cursor-pointer hover:border-amber-400 transition-colors mx-auto"
+                  className="col-span-3 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl w-30 h-30 flex items-center justify-center overflow-hidden p-1.5 relative shadow-inner cursor-pointer hover:border-amber-400 transition-colors mx-auto"
                   title="Ver Hoja de Servicios"
                 >
                   {agente.avatar_base64 ? (
