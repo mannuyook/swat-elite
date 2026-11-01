@@ -6,6 +6,7 @@ import { Medallas } from './components/Medallas';
 import { Movimientos } from './components/Movimientos';
 import { Roster } from './components/Roster';
 import { Macros } from './components/Macros';
+import { Footer } from './components/Footer';
 import { LogOut, User as UserIcon, Key, UserPlus, Camera, X, CheckCircle2 } from 'lucide-react';
 
 export function App() {
@@ -168,177 +169,184 @@ export function App() {
   if (!user) {
     return (
       <div 
-        className="flex h-screen w-screen items-center justify-center bg-cover bg-center text-white font-sans p-4 overflow-y-auto relative"
+        className="flex flex-col min-h-screen w-screen items-center justify-between bg-cover bg-center text-white font-sans p-4 overflow-y-auto relative"
         style={{ backgroundImage: "url('/fondo-login.png')" }}
       >
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] pointer-events-none"></div>
 
-        <div className="w-full max-w-md bg-[#0d172e]/95 border border-[#1b315e] rounded-2xl p-8 shadow-2xl space-y-6 my-auto relative z-10">
-          
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="w-20 h-20 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
-              <img 
-                src="/logo.jpg" 
-                alt="SWAT Elite Logo" 
-                className="w-full h-full object-cover rounded-full filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
-                onError={(e) => { e.target.src = '/logo.jpg'; }}
-              />
+        <div className="flex-1 flex items-center justify-center w-full z-10 py-8">
+          <div className="w-full max-w-md bg-[#0d172e]/95 border border-[#1b315e] rounded-2xl p-8 shadow-2xl space-y-6 relative">
+            
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="w-50 h-50 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+                <img 
+                  src="/logo.jpg" 
+                  alt="SWAT Elite Logo" 
+                  className="w-full h-full object-cover rounded-full filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
+                  onError={(e) => { e.target.src = '/logo.jpg'; }}
+                />
+              </div>
+              <div>
+                <h1 className="text-base font-black uppercase tracking-wider text-white">SWAT ELITE LINCOLN</h1>
+                <p className="text-xs text-slate-400 font-semibold mt-1">Portal de Acceso Restringido</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-base font-black uppercase tracking-wider text-white">SWAT ELITE LINCOLN</h1>
-              <p className="text-xs text-slate-400 font-semibold mt-1">Portal de Acceso Restringido</p>
+
+            <div className="grid grid-cols-2 gap-2 bg-[#13203c] p-1 rounded-xl border border-[#223966]">
+              <button
+                onClick={() => { setAuthView('login'); setLoginError(''); }}
+                className={`py-2 text-xs font-black uppercase rounded-lg transition-all cursor-pointer ${authView === 'login' ? 'bg-[#334155] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              >
+                Iniciar Sesión
+              </button>
+              <button
+                onClick={() => { setAuthView('register'); setRegError(''); setRegSuccess(''); }}
+                className={`py-2 text-xs font-black uppercase rounded-lg transition-all cursor-pointer ${authView === 'register' ? 'bg-[#334155] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              >
+                Registrar Agente
+              </button>
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-2 bg-[#13203c] p-1 rounded-xl border border-[#223966]">
-            <button
-              onClick={() => { setAuthView('login'); setLoginError(''); }}
-              className={`py-2 text-xs font-black uppercase rounded-lg transition-all cursor-pointer ${authView === 'login' ? 'bg-[#334155] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
-            >
-              Iniciar Sesión
-            </button>
-            <button
-              onClick={() => { setAuthView('register'); setRegError(''); setRegSuccess(''); }}
-              className={`py-2 text-xs font-black uppercase rounded-lg transition-all cursor-pointer ${authView === 'register' ? 'bg-[#334155] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
-            >
-              Registrar Agente
-            </button>
-          </div>
+            {authView === 'login' ? (
+              <div className="space-y-4">
+                {loginError && (
+                  <div className="p-3 bg-red-950/80 border border-red-500/60 rounded-xl text-red-300 text-xs text-center font-bold">
+                    {loginError}
+                  </div>
+                )}
 
-          {authView === 'login' ? (
-            <div className="space-y-4">
-              {loginError && (
-                <div className="p-3 bg-red-950/80 border border-red-500/60 rounded-xl text-red-300 text-xs text-center font-bold">
-                  {loginError}
-                </div>
-              )}
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Usuario / Agente</label>
+                    <div className="relative">
+                      <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                      <input 
+                        type="text"
+                        required
+                        placeholder="Ingrese su nombre de usuario"
+                        value={usernameInput}
+                        onChange={(e) => setUsernameInput(e.target.value)}
+                        className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl pl-9 pr-4 py-3 text-xs text-white outline-none shadow-inner transition-all"
+                      />
+                    </div>
+                  </div>
 
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Usuario / Agente</label>
-                  <div className="relative">
-                    <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Contraseña</label>
+                    <div className="relative">
+                      <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                      <input 
+                        type="password"
+                        required
+                        placeholder="••••••••"
+                        value={passwordInput}
+                        onChange={(e) => setPasswordInput(e.target.value)}
+                        className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl pl-9 pr-4 py-3 text-xs text-white outline-none shadow-inner transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    type="submit"
+                    disabled={loadingLogin}
+                    className="w-full py-3 bg-[#334155] hover:bg-[#475569] border border-[#475569] rounded-xl text-xs font-black uppercase text-white tracking-wider shadow-lg transition-all cursor-pointer mt-2"
+                  >
+                    {loadingLogin ? 'Verificando credenciales...' : 'Iniciar Sesión'}
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {regError && (
+                  <div className="p-3 bg-red-950/80 border border-red-500/60 rounded-xl text-red-300 text-xs text-center font-bold">
+                    {regError}
+                  </div>
+                )}
+                {regSuccess && (
+                  <div className="p-3 bg-emerald-950/80 border border-emerald-500/60 rounded-xl text-emerald-300 text-xs text-center font-bold">
+                    {regSuccess}
+                  </div>
+                )}
+
+                <form onSubmit={handleRegister} className="space-y-3.5">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Nombre de Agente</label>
                     <input 
                       type="text"
                       required
-                      placeholder="Ingrese su nombre de usuario"
-                      value={usernameInput}
-                      onChange={(e) => setUsernameInput(e.target.value)}
-                      className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl pl-9 pr-4 py-3 text-xs text-white outline-none shadow-inner transition-all"
+                      placeholder="Ej. Naranjo"
+                      value={regUsername}
+                      onChange={(e) => setRegUsername(e.target.value)}
+                      className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-4 py-2.5 text-xs text-white outline-none shadow-inner transition-all"
                     />
                   </div>
-                </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Contraseña</label>
-                  <div className="relative">
-                    <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Contraseña</label>
                     <input 
                       type="password"
                       required
                       placeholder="••••••••"
-                      value={passwordInput}
-                      onChange={(e) => setPasswordInput(e.target.value)}
-                      className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl pl-9 pr-4 py-3 text-xs text-white outline-none shadow-inner transition-all"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-4 py-2.5 text-xs text-white outline-none shadow-inner transition-all"
                     />
                   </div>
-                </div>
 
-                <button 
-                  type="submit"
-                  disabled={loadingLogin}
-                  className="w-full py-3 bg-[#334155] hover:bg-[#475569] border border-[#475569] rounded-xl text-xs font-black uppercase text-white tracking-wider shadow-lg transition-all cursor-pointer mt-2"
-                >
-                  {loadingLogin ? 'Verificando credenciales...' : 'Iniciar Sesión'}
-                </button>
-              </form>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {regError && (
-                <div className="p-3 bg-red-950/80 border border-red-500/60 rounded-xl text-red-300 text-xs text-center font-bold">
-                  {regError}
-                </div>
-              )}
-              {regSuccess && (
-                <div className="p-3 bg-emerald-950/80 border border-emerald-500/60 rounded-xl text-emerald-300 text-xs text-center font-bold">
-                  {regSuccess}
-                </div>
-              )}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Rango Inicial</label>
+                      <select
+                        value={regRango}
+                        onChange={(e) => setRegRango(e.target.value)}
+                        className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-3 py-2.5 text-xs text-white outline-none shadow-inner cursor-pointer font-bold"
+                      >
+                        <option value="Recluta">Recluta</option>
+                        <option value="Sargento">Sargento</option>
+                        <option value="Sargento Primero">Sargento Primero</option>
+                        <option value="Teniente">Teniente</option>
+                        <option value="Capitán">Capitán</option>
+                        <option value="Mayor">Mayor</option>
+                        <option value="Coronel">Coronel</option>
+                        <option value="Teniente General">Teniente General</option>
+                        <option value="Mayor General">Mayor General</option>
+                        <option value="General Adjunto">General Adjunto</option>
+                      </select>
+                    </div>
 
-              <form onSubmit={handleRegister} className="space-y-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Nombre de Agente</label>
-                  <input 
-                    type="text"
-                    required
-                    placeholder="Ej. Naranjo"
-                    value={regUsername}
-                    onChange={(e) => setRegUsername(e.target.value)}
-                    className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-4 py-2.5 text-xs text-white outline-none shadow-inner transition-all"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Contraseña</label>
-                  <input 
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                    className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-4 py-2.5 text-xs text-white outline-none shadow-inner transition-all"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Rango Inicial</label>
-                    <select
-                      value={regRango}
-                      onChange={(e) => setRegRango(e.target.value)}
-                      className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-3 py-2.5 text-xs text-white outline-none shadow-inner cursor-pointer font-bold"
-                    >
-                      <option value="Recluta">Recluta</option>
-                      <option value="Sargento">Sargento</option>
-                      <option value="Sargento Primero">Sargento Primero</option>
-                      <option value="Teniente">Teniente</option>
-                      <option value="Capitán">Capitán</option>
-                      <option value="Mayor">Mayor</option>
-                      <option value="Coronel">Coronel</option>
-                      <option value="Teniente General">Teniente General</option>
-                      <option value="Mayor General">Mayor General</option>
-                      <option value="General Adjunto">General Adjunto</option>
-                    </select>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Nº Placa (1-500)</label>
+                      <input 
+                        type="number"
+                        min="1"
+                        max="500"
+                        placeholder="Ej. 33"
+                        value={regPlaca}
+                        onChange={(e) => setRegPlaca(e.target.value)}
+                        className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-3 py-2.5 text-xs text-white outline-none shadow-inner"
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Nº Placa (1-500)</label>
-                    <input 
-                      type="number"
-                      min="1"
-                      max="500"
-                      placeholder="Ej. 33"
-                      value={regPlaca}
-                      onChange={(e) => setRegPlaca(e.target.value)}
-                      className="w-full bg-[#13203c] border border-[#223966] focus:border-amber-500/60 rounded-xl px-3 py-2.5 text-xs text-white outline-none shadow-inner"
-                    />
-                  </div>
-                </div>
+                  <button 
+                    type="submit"
+                    disabled={loadingReg}
+                    className="w-full py-3 bg-[#334155] hover:bg-[#475569] border border-[#475569] rounded-xl text-xs font-black uppercase text-white tracking-wider shadow-lg transition-all cursor-pointer mt-2 flex items-center justify-center space-x-2"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>{loadingReg ? 'Registrando en Base de Datos...' : 'Registrar Nuevo Agente'}</span>
+                  </button>
+                </form>
+              </div>
+            )}
 
-                <button 
-                  type="submit"
-                  disabled={loadingReg}
-                  className="w-full py-3 bg-[#334155] hover:bg-[#475569] border border-[#475569] rounded-xl text-xs font-black uppercase text-white tracking-wider shadow-lg transition-all cursor-pointer mt-2 flex items-center justify-center space-x-2"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  <span>{loadingReg ? 'Registrando en Base de Datos...' : 'Registrar Nuevo Agente'}</span>
-                </button>
-              </form>
-            </div>
-          )}
-
+          </div>
         </div>
+
+        <div className="w-full z-10">
+          <Footer />
+        </div>
+
       </div>
     );
   }
@@ -437,7 +445,7 @@ export function App() {
         </div>
       </aside>
 
-      {/* CONTENEDOR DERECHO (BARRA SUPERIOR + CONTENIDO) */}
+      {/* CONTENEDOR DERECHO (BARRA SUPERIOR + CONTENIDO + FOOTER) */}
       <div className="flex-1 flex flex-col overflow-hidden bg-[#070e1b]">
         
         {/* BARRA SUPERIOR */}
@@ -447,7 +455,7 @@ export function App() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Botón de Perfil (Sustituye a Notificaciones) */}
+            {/* Botón de Perfil */}
             <button 
               onClick={() => {
                 setAvatarPreview(user.avatar_base64 || '');
@@ -460,7 +468,7 @@ export function App() {
               <span>Perfil</span>
             </button>
 
-            {/* Botón Cerrar Sesión Real */}
+            {/* Botón Cerrar Sesión */}
             <button 
               onClick={handleLogout}
               title="Cerrar Sesión"
@@ -482,6 +490,8 @@ export function App() {
             {activeTab === 'macros' && <Macros />}
           </div>
         </main>
+
+        <Footer />
 
       </div>
 
