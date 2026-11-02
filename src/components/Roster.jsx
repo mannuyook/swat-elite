@@ -434,10 +434,10 @@ export function Roster({ user }) {
                 key={agente.id}
                 className="grid grid-cols-12 gap-3 p-3 bg-[#0a1324] border border-[#1b315e] hover:border-slate-500 rounded-xl shadow-lg items-center transition-all group"
               >
-                {/* AVATAR CUADRADO */}
+                {/* AVATAR CUADRADO (Tamaño original intacto, añadido flex-shrink-0) */}
                 <div 
                   onClick={() => abrirPerfilPublico(agente)}
-                  className="col-span-3 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl w-25 h-25 flex items-center justify-center overflow-hidden p-1.5 relative shadow-inner cursor-pointer hover:border-amber-400 transition-colors mx-auto"
+                  className="col-span-3 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl w-25 h-25 flex items-center justify-center overflow-hidden p-1.5 relative shadow-inner cursor-pointer hover:border-amber-400 transition-colors mx-auto flex-shrink-0"
                   title="Ver Hoja de Servicios"
                 >
                   {agente.avatar_base64 ? (
@@ -448,34 +448,34 @@ export function Roster({ user }) {
                   <span className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0a1324] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                 </div>
 
-                {/* NOMBRE */}
+                {/* NOMBRE (Con min-w-0 y truncate para evitar que colisione) */}
                 <div 
                   onClick={() => abrirPerfilPublico(agente)}
-                  className="col-span-9 sm:col-span-3 bg-[#13203c] border border-[#223966] rounded-xl h-16 px-4 flex items-center shadow-inner cursor-pointer hover:border-amber-400 transition-colors"
+                  className="col-span-9 sm:col-span-3 bg-[#13203c] border border-[#223966] rounded-xl h-16 px-4 flex items-center shadow-inner cursor-pointer hover:border-amber-400 transition-colors min-w-0 overflow-hidden"
                   title="Ver Hoja de Servicios"
                 >
-                  <span className="text-xs sm:text-sm font-black uppercase text-white tracking-wide truncate">
+                  <span className="text-xs sm:text-sm font-black uppercase text-white tracking-wide truncate w-full">
                     {agente.username || 'Sin Nombre'}
                   </span>
                 </div>
 
                 {/* RANGO */}
-                <div className="col-span-4 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl h-16 px-3 flex items-center justify-center text-center shadow-inner">
-                  <span className="text-[11px] sm:text-xs font-bold uppercase text-slate-200 truncate">
+                <div className="col-span-4 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl h-16 px-3 flex items-center justify-center text-center shadow-inner min-w-0 overflow-hidden">
+                  <span className="text-[11px] sm:text-xs font-bold uppercase text-slate-200 truncate w-full">
                     {agente.rango || 'Recluta'}
                   </span>
                 </div>
 
                 {/* PLACA */}
                 <div className="col-span-4 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl h-16 px-3 flex items-center justify-center text-center shadow-inner">
-                  <span className="text-xs sm:text-sm font-mono font-black text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-3 py-1 rounded-lg">
+                  <span className="text-xs sm:text-sm font-mono font-black text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-3 py-1 rounded-lg truncate">
                     #{agente.placa ? String(agente.placa).padStart(2, '0') : '00'}
                   </span>
                 </div>
 
                 {/* ROL */}
-                <div className="col-span-4 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl h-16 px-3 flex items-center justify-center text-center shadow-inner">
-                  <span className={`text-[11px] font-mono font-bold uppercase px-2 py-1 rounded-md border ${
+                <div className="col-span-4 sm:col-span-2 bg-[#13203c] border border-[#223966] rounded-xl h-16 px-3 flex items-center justify-center text-center shadow-inner min-w-0 overflow-hidden">
+                  <span className={`text-[11px] font-mono font-bold uppercase px-2 py-1 rounded-md border truncate w-full ${
                     agente.rol === 'developer' ? 'text-amber-400 border-amber-500/40 bg-amber-950/30' :
                     agente.rol === 'administrador' ? 'text-purple-400 border-purple-500/40 bg-purple-950/30' :
                     agente.rol === 'auxiliar' ? 'text-blue-400 border-blue-500/40 bg-blue-950/30' :
@@ -533,12 +533,12 @@ export function Roster({ user }) {
                   <User className="w-10 h-10 text-slate-400" />
                 )}
               </div>
-              <div className="space-y-1">
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 bg-amber-950/40 border border-amber-800/40 px-2.5 py-1 rounded-md">
+              <div className="space-y-1 min-w-0 flex-1">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 bg-amber-950/40 border border-amber-800/40 px-2.5 py-1 rounded-md inline-block">
                   Placa #{viewProfileAgent.placa ? String(viewProfileAgent.placa).padStart(2, '0') : '00'}
                 </span>
-                <h3 className="text-xl font-black uppercase text-white tracking-wide pt-1">{viewProfileAgent.username}</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase">Rango: <span className="text-slate-200">{viewProfileAgent.rango || 'Recluta'}</span> | Rol: <span className="text-amber-400">{viewProfileAgent.rol || 'miembro'}</span></p>
+                <h3 className="text-xl font-black uppercase text-white tracking-wide pt-1 truncate">{viewProfileAgent.username}</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase truncate">Rango: <span className="text-slate-200">{viewProfileAgent.rango || 'Recluta'}</span> | Rol: <span className="text-amber-400">{viewProfileAgent.rol || 'miembro'}</span></p>
               </div>
             </div>
 
@@ -564,14 +564,14 @@ export function Roster({ user }) {
                     </div>
                   ) : (
                     profileCursos.map((c) => (
-                      <div key={c.id} className="flex items-center justify-between p-4 bg-[#0d172e] border border-[#1b315e] rounded-2xl shadow-md hover:border-slate-500 transition-all">
-                        <div className="flex items-center space-x-4 overflow-hidden">
+                      <div key={c.id} className="flex items-center justify-between p-4 bg-[#0d172e] border border-[#1b315e] rounded-2xl shadow-md hover:border-slate-500 transition-all gap-3">
+                        <div className="flex items-center space-x-4 overflow-hidden min-w-0 flex-1">
                           {c.imagen ? (
                             <img src={c.imagen} alt="" className="w-16 h-16 object-cover rounded-xl flex-shrink-0 border border-[#223966]" />
                           ) : (
                             <div className="w-16 h-16 rounded-xl bg-[#13203c] border border-[#223966] flex items-center justify-center flex-shrink-0 text-amber-400 font-black text-sm">C</div>
                           )}
-                          <div className="overflow-hidden">
+                          <div className="overflow-hidden min-w-0 flex-1">
                             <span className="text-xs font-black text-white uppercase tracking-wide block truncate">{c.nombre}</span>
                             <span className="text-[10px] text-slate-400 block truncate">Curso táctico oficial</span>
                           </div>
@@ -605,14 +605,14 @@ export function Roster({ user }) {
                     </div>
                   ) : (
                     profileMedallas.map((m) => (
-                      <div key={m.id} className="flex items-center justify-between p-4 bg-[#0d172e] border border-[#1b315e] rounded-2xl shadow-md hover:border-slate-500 transition-all">
-                        <div className="flex items-center space-x-4 overflow-hidden">
+                      <div key={m.id} className="flex items-center justify-between p-4 bg-[#0d172e] border border-[#1b315e] rounded-2xl shadow-md hover:border-slate-500 transition-all gap-3">
+                        <div className="flex items-center space-x-4 overflow-hidden min-w-0 flex-1">
                           {m.imagen ? (
                             <img src={m.imagen} alt="" className="w-16 h-16 object-cover rounded-xl flex-shrink-0 border border-[#223966]" />
                           ) : (
                             <div className="w-12 h-12 rounded-xl bg-[#13203c] border border-[#223966] flex items-center justify-center flex-shrink-0 text-amber-400 font-black text-sm">M</div>
                           )}
-                          <div className="overflow-hidden">
+                          <div className="overflow-hidden min-w-0 flex-1">
                             <span className="text-xs font-black text-white uppercase tracking-wide block truncate">{m.nombre}</span>
                             <span className="text-[10px] text-slate-400 block truncate">{m.descripcion || 'Sin descripción'}</span>
                           </div>
@@ -654,10 +654,10 @@ export function Roster({ user }) {
             </button>
 
             <div className="flex items-center space-x-3 border-b border-[#1b315e] pb-4">
-              <ShieldAlert className="w-6 h-6 text-amber-400" />
-              <div>
-                <h3 className="text-sm font-black uppercase text-white">Gestión de Agente y Condecoraciones</h3>
-                <p className="text-xs text-slate-400 font-bold">Modificando expediente de: <span className="text-amber-400">{selectedAgent.username}</span></p>
+              <ShieldAlert className="w-6 h-6 text-amber-400 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-black uppercase text-white truncate">Gestión de Agente y Condecoraciones</h3>
+                <p className="text-xs text-slate-400 font-bold truncate">Modificando expediente de: <span className="text-amber-400">{selectedAgent.username}</span></p>
               </div>
             </div>
 

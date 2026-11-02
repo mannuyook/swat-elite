@@ -370,7 +370,7 @@ export function App() {
         <div className="space-y-4 md:space-y-6">
           
           <div className="flex flex-col items-center text-center p-2 space-y-3 border-b border-[#1b315e] pb-4 md:pb-6">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl flex-shrink-0">
               <img 
                 src={user.avatar_base64 || "/logo.jpg"} 
                 alt="SWAT Elite Logo" 
@@ -378,9 +378,9 @@ export function App() {
                 onError={(e) => { e.target.src = '/logo.jpg'; }}
               />
             </div>
-            <div>
-              <h1 className="text-sm font-black uppercase tracking-wider text-white">SWAT ELITE</h1>
-              <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Lincoln</p>
+            <div className="min-w-0 w-full px-1">
+              <h1 className="text-sm font-black uppercase tracking-wider text-white truncate">SWAT ELITE</h1>
+              <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">Lincoln</p>
             </div>
           </div>
 
@@ -437,7 +437,7 @@ export function App() {
                 user.username ? user.username.charAt(0).toUpperCase() : 'U'
               )}
             </div>
-            <div className="overflow-hidden">
+            <div className="overflow-hidden min-w-0">
               <p className="text-xs font-black text-white truncate">{user.username}</p>
               <p className="text-[10px] text-slate-400 uppercase tracking-wide truncate">{user.rol || 'Miembro'}</p>
             </div>
@@ -449,9 +449,9 @@ export function App() {
       <div className="flex-1 flex flex-col min-w-0 bg-[#070e1b] overflow-hidden">
         
         {/* BARRA SUPERIOR */}
-        <header className="h-16 md:h-20 bg-[#1e293b]/90 backdrop-blur-md border-b border-[#334155] px-4 sm:px-8 flex justify-between items-center shadow-md flex-shrink-0">
-          <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-200 truncate pr-2">
-            Bienvenido, <span className="text-amber-400">{user.username} ({user.rol})</span>
+        <header className="h-16 md:h-20 bg-[#1e293b]/90 backdrop-blur-md border-b border-[#334155] px-4 sm:px-8 flex justify-between items-center shadow-md flex-shrink-0 gap-2">
+          <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-200 truncate min-w-0 flex-1">
+            Bienvenido, <span className="text-amber-400 truncate">{user.username} ({user.rol})</span>
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
@@ -464,7 +464,7 @@ export function App() {
               }}
               className="flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-4 py-2 bg-[#334155] hover:bg-[#475569] border border-amber-500/50 rounded-xl text-xs font-black uppercase text-amber-400 shadow-lg transition-all cursor-pointer"
             >
-              <UserIcon className="w-4 h-4 text-amber-400" />
+              <UserIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
               <span className="hidden sm:inline">Perfil</span>
             </button>
 
@@ -474,7 +474,7 @@ export function App() {
               title="Cerrar Sesión"
               className="flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-4 py-2 bg-red-950/60 hover:bg-red-900/80 border border-red-500/60 text-red-400 hover:text-red-300 rounded-xl text-xs font-black uppercase shadow-lg transition-all cursor-pointer"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 flex-shrink-0" />
               <span className="hidden sm:inline">Salir</span>
             </button>
           </div>
@@ -515,21 +515,21 @@ export function App() {
 
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div className="flex flex-col items-center space-y-3">
-                <div className="w-24 h-24 rounded-full bg-[#13203c] border-2 border-amber-500/60 overflow-hidden flex items-center justify-center shadow-xl">
+                <div className="w-24 h-24 rounded-full bg-[#13203c] border-2 border-amber-500/60 overflow-hidden flex items-center justify-center shadow-xl flex-shrink-0">
                   {avatarPreview ? (
                     <img src={avatarPreview} alt="Avatar Preview" className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-2xl font-black text-amber-400">{user.username ? user.username.charAt(0).toUpperCase() : 'U'}</span>
                   )}
                 </div>
-                <p className="text-xs text-slate-400 font-semibold">Agente: <span className="text-white font-bold">{user.username}</span></p>
+                <p className="text-xs text-slate-400 font-semibold truncate max-w-full">Agente: <span className="text-white font-bold">{user.username}</span></p>
               </div>
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase text-slate-400">Subir Nueva Foto de Perfil</label>
                 <label className="flex cursor-pointer bg-[#13203c] hover:bg-[#18284b] border border-[#223966] rounded-xl px-4 py-3 items-center justify-center space-x-2 text-xs font-bold text-slate-300 transition-all shadow-inner">
-                  <Camera className="w-4 h-4 text-amber-400" />
-                  <span>Seleccionar Imagen...</span>
+                  <Camera className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span className="truncate">Seleccionar Imagen...</span>
                   <input 
                     type="file" 
                     accept="image/*" 
