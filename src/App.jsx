@@ -169,16 +169,16 @@ export function App() {
   if (!user) {
     return (
       <div 
-        className="flex flex-col min-h-screen w-screen items-center justify-between bg-cover bg-center text-white font-sans p-4 overflow-y-auto relative"
+        className="flex flex-col min-h-screen w-full items-center justify-between bg-cover bg-center text-white font-sans px-4 py-6 overflow-y-auto relative"
         style={{ backgroundImage: "url('/fondo-login.png')" }}
       >
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] pointer-events-none"></div>
 
-        <div className="flex-1 flex items-center justify-center w-full z-10 py-8">
-          <div className="w-full max-w-md bg-[#0d172e]/95 border border-[#1b315e] rounded-2xl p-8 shadow-2xl space-y-6 relative">
+        <div className="flex-1 flex items-center justify-center w-full z-10 py-4">
+          <div className="w-full max-w-md bg-[#0d172e]/95 border border-[#1b315e] rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 relative mx-auto">
             
             <div className="flex flex-col items-center text-center space-y-3">
-              <div className="w-50 h-50 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#13203c] border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
                 <img 
                   src="/logo.jpg" 
                   alt="SWAT Elite Logo" 
@@ -187,7 +187,7 @@ export function App() {
                 />
               </div>
               <div>
-                <h1 className="text-base font-black uppercase tracking-wider text-white">SWAT ELITE LINCOLN</h1>
+                <h1 className="text-sm sm:text-base font-black uppercase tracking-wider text-white">SWAT ELITE LINCOLN</h1>
                 <p className="text-xs text-slate-400 font-semibold mt-1">Portal de Acceso Restringido</p>
               </div>
             </div>
@@ -293,7 +293,7 @@ export function App() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Rango Inicial</label>
                       <select
@@ -343,7 +343,7 @@ export function App() {
           </div>
         </div>
 
-        <div className="w-full z-10">
+        <div className="w-full z-10 mt-4">
           <Footer />
         </div>
 
@@ -355,7 +355,7 @@ export function App() {
   // SI HAY SESIÓN ACTIVA, MOSTRAR PANEL TÁCTICO
   // ==========================================
   return (
-    <div className="flex h-screen bg-[#070e1b] text-white font-sans overflow-hidden relative">
+    <div className="flex flex-col md:flex-row min-h-screen md:h-screen bg-[#070e1b] text-white font-sans overflow-x-hidden relative">
       
       {/* TOAST FLOTANTE */}
       {profileToast && (
@@ -366,11 +366,11 @@ export function App() {
       )}
 
       {/* MENÚ LATERAL DE NAVEGACIÓN TÁCTICA */}
-      <aside className="w-64 bg-[#0d172e] border-r border-[#1b315e] p-5 flex flex-col justify-between shadow-2xl flex-shrink-0">
-        <div className="space-y-6">
+      <aside className="w-full md:w-64 bg-[#0d172e] border-b md:border-b-0 md:border-r border-[#1b315e] p-4 sm:p-5 flex flex-col justify-between shadow-2xl flex-shrink-0">
+        <div className="space-y-4 md:space-y-6">
           
-          <div className="flex flex-col items-center text-center p-2 space-y-3 border-b border-[#1b315e] pb-6">
-            <div className="w-20 h-20 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
+          <div className="flex flex-col items-center text-center p-2 space-y-3 border-b border-[#1b315e] pb-4 md:pb-6">
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#13203c]/60 border border-[#223966] overflow-hidden flex items-center justify-center shadow-xl">
               <img 
                 src={user.avatar_base64 || "/logo.jpg"} 
                 alt="SWAT Elite Logo" 
@@ -386,49 +386,49 @@ export function App() {
 
           <div className="space-y-2">
             <p className="px-2 text-[10px] font-black uppercase text-slate-500 tracking-wider">Navegación</p>
-            <nav className="space-y-1">
+            <nav className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-col gap-1.5 md:space-y-1">
               {puedeVerMovimientos && (
                 <button 
                   onClick={() => setActiveTab('movimientos')}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-3 cursor-pointer ${activeTab === 'movimientos' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
+                  className={`w-full text-left px-3.5 md:px-4 py-2.5 md:py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-2 md:space-x-3 cursor-pointer ${activeTab === 'movimientos' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
                 >
-                  <span>Movimientos</span>
+                  <span className="truncate">Movimientos</span>
                 </button>
               )}
 
               <button 
                 onClick={() => setActiveTab('cursos')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-3 cursor-pointer ${activeTab === 'cursos' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
+                className={`w-full text-left px-3.5 md:px-4 py-2.5 md:py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-2 md:space-x-3 cursor-pointer ${activeTab === 'cursos' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
               >
-                <span>Cursos</span>
+                <span className="truncate">Cursos</span>
               </button>
 
               <button 
                 onClick={() => setActiveTab('medallas')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-3 cursor-pointer ${activeTab === 'medallas' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
+                className={`w-full text-left px-3.5 md:px-4 py-2.5 md:py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-2 md:space-x-3 cursor-pointer ${activeTab === 'medallas' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
               >
-                <span>Medallas</span>
+                <span className="truncate">Medallas</span>
               </button>
 
               <button 
                 onClick={() => setActiveTab('miembros')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-3 cursor-pointer ${activeTab === 'miembros' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
+                className={`w-full text-left px-3.5 md:px-4 py-2.5 md:py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-2 md:space-x-3 cursor-pointer ${activeTab === 'miembros' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
               >
-                <span>Lista de Miembros</span>
+                <span className="truncate">Lista de Miembros</span>
               </button>
 
               <button 
                 onClick={() => setActiveTab('macros')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-3 cursor-pointer ${activeTab === 'macros' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
+                className={`w-full text-left px-3.5 md:px-4 py-2.5 md:py-3 rounded-xl text-xs font-bold uppercase transition-all flex items-center space-x-2 md:space-x-3 cursor-pointer ${activeTab === 'macros' ? 'bg-[#334155] text-white border border-[#475569] shadow-lg' : 'text-slate-300 hover:bg-[#1e293b] hover:text-white'}`}
               >
-                <span>Macros</span>
+                <span className="truncate">Macros</span>
               </button>
             </nav>
           </div>
 
         </div>
 
-        <div className="pt-4 border-t border-[#1b315e] px-2 flex items-center justify-between">
+        <div className="hidden md:flex pt-4 border-t border-[#1b315e] px-2 items-center justify-between">
           <div className="flex items-center space-x-3 overflow-hidden">
             <div className="w-8 h-8 rounded-xl bg-[#1e293b] border border-[#334155] overflow-hidden flex items-center justify-center text-xs font-black text-slate-200 shadow-inner flex-shrink-0">
               {user.avatar_base64 ? (
@@ -446,15 +446,15 @@ export function App() {
       </aside>
 
       {/* CONTENEDOR DERECHO (BARRA SUPERIOR + CONTENIDO + FOOTER) */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#070e1b]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#070e1b] overflow-hidden">
         
         {/* BARRA SUPERIOR */}
-        <header className="h-20 bg-[#1e293b]/90 backdrop-blur-md border-b border-[#334155] px-8 flex justify-between items-center shadow-md flex-shrink-0">
-          <div className="text-xs font-black uppercase tracking-wider text-slate-200">
+        <header className="h-16 md:h-20 bg-[#1e293b]/90 backdrop-blur-md border-b border-[#334155] px-4 sm:px-8 flex justify-between items-center shadow-md flex-shrink-0">
+          <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-200 truncate pr-2">
             Bienvenido, <span className="text-amber-400">{user.username} ({user.rol})</span>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             {/* Botón de Perfil */}
             <button 
               onClick={() => {
@@ -462,27 +462,27 @@ export function App() {
                 setAvatarBase64(user.avatar_base64 || '');
                 setShowProfileModal(true);
               }}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-[#334155] hover:bg-[#475569] border border-amber-500/50 rounded-xl text-xs font-black uppercase text-amber-400 shadow-lg transition-all cursor-pointer"
+              className="flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-4 py-2 bg-[#334155] hover:bg-[#475569] border border-amber-500/50 rounded-xl text-xs font-black uppercase text-amber-400 shadow-lg transition-all cursor-pointer"
             >
               <UserIcon className="w-4 h-4 text-amber-400" />
-              <span>Perfil</span>
+              <span className="hidden sm:inline">Perfil</span>
             </button>
 
             {/* Botón Cerrar Sesión */}
             <button 
               onClick={handleLogout}
               title="Cerrar Sesión"
-              className="flex items-center space-x-2 px-4 py-2.5 bg-red-950/60 hover:bg-red-900/80 border border-red-500/60 text-red-400 hover:text-red-300 rounded-xl text-xs font-black uppercase shadow-lg transition-all cursor-pointer"
+              className="flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-4 py-2 bg-red-950/60 hover:bg-red-900/80 border border-red-500/60 text-red-400 hover:text-red-300 rounded-xl text-xs font-black uppercase shadow-lg transition-all cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
-              <span>Salir</span>
+              <span className="hidden sm:inline">Salir</span>
             </button>
           </div>
         </header>
 
         {/* ÁREA DE CONTENIDO PRINCIPAL */}
-        <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+          <div className="max-w-7xl mx-auto w-full">
             {activeTab === 'cursos' && <Cursos user={user} />}
             {activeTab === 'medallas' && <Medallas user={user} />}
             {activeTab === 'movimientos' && puedeVerMovimientos && <Movimientos user={user} />}
@@ -498,7 +498,7 @@ export function App() {
       {/* MODAL DE PERFIL Y SUBIDA DE FOTO EN BASE64 */}
       {showProfileModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0d172e] border border-[#223d73] w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-5 animate-fade-in">
+          <div className="bg-[#0d172e] border border-[#223d73] w-full max-w-md rounded-2xl shadow-2xl p-5 sm:p-6 space-y-5 animate-fade-in mx-4">
             
             <div className="flex justify-between items-center border-b border-[#1b315e] pb-3">
               <h3 className="text-sm font-black uppercase tracking-wider text-white flex items-center space-x-2">
